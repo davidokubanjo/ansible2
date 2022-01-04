@@ -1,38 +1,43 @@
 ---
 
-- hosts: all
-  become: true
-  tasks:
+  - hosts: all
+    become: true
+    pre_tasks:
   
-  - name: update repository index
-    yum:
-      update_cache: yes
-      when: ansible_distribution == "CentOS"
-  
-  - name: install the lastest version of httpd
-    yum:
-      name: httpd
-      state: latest
-    when: ansible_distribution == "CentOS"
+     - name: update repository index
+       tags: always
+       yum:
+         update_cache: yes
+       when: ansible_distribution == "CentOS"
+
+  - hosts: all
+    become: true
+    tasks:
+
+       - name: add ssh key for bukmatic
+         tags: always
+         authorized_key:
+           user: bukmatic
+           key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDmQB2IVrt1a7R1f4NnqOijMtTJx+xb8XwiMIdWIjDROzqNKSQ43dRy/yQ5xCMwaGsLLwqkPK8F1UibdEI1osU036QU4rJNjjWmUo1S6RazFgTRi1fMb2pIc3aGGgHEhLO2eSzFiRdlFBuEXLp9YZC+cBjBBb5gyWrQSe91aFoFTmkD76Gln0pQzPN1wgoSAGmlF0M4qW64rliBubkvlzKZVwcPLdWAXCirlMoElGeYbAZ7Fo+PXkd2Lun61QfxGTHPJkUjb1Si4XmU46zwmZUEeOAdoVmYGYLY0ZzlPdWG0L1WMA5NpX9zaa6WEJ86tF77WWpnseD1W9fUtQL1dYwuuwdzAysLFZROZGICI2czwXybnggOOwMUqa9LsBb2htSet+S4H6QwR9CvLzqtVVV3AUwNHwCGnu8mTIMs/lIfGZr2sQ9Il4Cej1kLH4rT5ZNQic296GX3H3uy5zK6TO1ngFKQbugLQ8HXePGREzif6C+TTqibh5NzEtZP26rBPG9O8lz0MoaPUf8JhDrdxjmCQ14R3T/b7PrbyZJ6gr1eHXLAV2bfKv6EZTVOlEWbQxBmt69IKtDS4ItbcQmNUY5FL9cZMn2FtDWox9DooP1+CzGJMivudJGmHW8d/lcI9Wv9MGA9w4rKQrLop4DLhY2az2pEHNb5nLhUoo8JpJ1ffQ== ansible"
+
+       - name: install the lastest version of httpd
+         yum:
+           name: httpd
+           state: latest
+         when: ansible_distribution == "CentOS"
     
-  - name: copy website test html
-    copy:
-      src: web_site.html
-      dest: /var/www/html/index.html
-      owner: root
-      group: root
-      mode: 0644
+       - name: copy website test html
+         copy:
+           src: web_site.html
+           dest: /var/www/html/index.html
+           owner: root
+           group: root
+           mode: 0644
  
-  - name: restart httpd (CentOS)
-    service: 
-      name: httpd
-      state: restarted
-      enabled: yes 
-    when: ansible_distribution == "CentOS"
+       - name: restart httpd (CentOS)
+         service: 
+           name: httpd
+           state: restarted
+           enabled: yes 
+         when: ansible_distribution == "CentOS"
     
-  - name: change operator
-    lineinfile:
-      path: /root/ansible/ansible2/testing.conf
-      regexp: '^operator'
-      line: Operator is Bukmatic
-    when: ansible_distribution == "CentOS" 
