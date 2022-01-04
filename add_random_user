@@ -1,0 +1,12 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+  
+  - name: create user bukmatic
+    tags: always
+    user:
+      name: bukmatic
+      groups: bukmatic
+ 
