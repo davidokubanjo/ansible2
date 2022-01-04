@@ -1,0 +1,38 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+  
+  - name: update repository index
+    yum:
+      update_cache: yes
+      when: ansible_distribution == "CentOS"
+  
+  - name: install the lastest version of httpd
+    yum:
+      name: httpd
+      state: latest
+    when: ansible_distribution == "CentOS"
+    
+  - name: copy website test html
+    copy:
+      src: web_site.html
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: 0644
+ 
+  - name: restart httpd (CentOS)
+    service: 
+      name: httpd
+      state: restarted
+      enabled: yes 
+    when: ansible_distribution == "CentOS"
+    
+  - name: change operator
+    lineinfile:
+      path: /root/ansible/ansible2/testing.conf
+      regexp: '^operator'
+      line: Operator is Bukmatic
+    when: ansible_distribution == "CentOS" 
