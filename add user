@@ -1,0 +1,26 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+  
+  - name: create user bukmatic
+    tags: always
+    user:
+      name: bukmatic
+      groups: root
+    
+  - name: add ssh key for bukmatic
+    tags: always
+    authorized_keys:
+      user: bukmatic
+      key: "put ansible public key here"
+      
+ - name: add sudoers file for bukmatic
+   tags: always
+   copy: 
+     src: sudoer_bukmatic
+     dest: /etc/sudoers.d/bukmatic
+     owner: root
+     group: root
+     mode: 0440
