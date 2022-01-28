@@ -1,0 +1,14 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+  
+  - name: change /etc/yum.conf (CentOS)
+    tags: yum, centos
+    lineinfile: 
+      path: /etc/yum.conf
+      regexp: 'installonly'
+      line: installonly_limit=3
+    when: ansible_distribution == "CentOS"
+ 
